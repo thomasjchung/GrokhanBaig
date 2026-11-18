@@ -8,15 +8,13 @@ const tabs: { id: Tab; label: string }[] = [
 
 export function TabBar({
   tab,
-  surface,
   onChange,
 }: {
-  tab: Tab
-  surface: "photo" | "paper"
+  tab: Tab | null
   onChange: (tab: Tab) => void
 }) {
   return (
-    <nav className={surface === "paper" ? "tabbar on-paper" : "tabbar"} aria-label="Sections">
+    <nav className="tabbar" aria-label="Sections">
       {tabs.map((item) => (
         <button
           key={item.id}

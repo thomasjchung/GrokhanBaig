@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 import { ClubPicker } from "./components/ClubPicker"
+import { DailyEvent } from "./components/DailyEvent"
 import { EventFeed } from "./components/EventFeed"
 import { InfoSheet } from "./components/InfoSheet"
 import { ProfileScreen } from "./components/ProfileScreen"
@@ -13,6 +14,7 @@ export function App() {
   const [infoId, setInfoId] = useState<string | null>(null)
   const [feedIndex, setFeedIndex] = useState(0)
   const [savedIndex, setSavedIndex] = useState(0)
+  const [dailyOpen, setDailyOpen] = useState(false)
 
   const onFeedIndex = useCallback((index: number) => setFeedIndex(index), [])
   const onSavedIndex = useCallback((index: number) => setSavedIndex(index), [])
@@ -24,7 +26,7 @@ export function App() {
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (infoEvent) return
+      if (infoEvent || dailyOpen) return
       if (tab !== "feed" && tab !== "saved") return
       if (
         event.key !== "ArrowDown" &&
@@ -49,11 +51,17 @@ export function App() {
 
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [campus.feed.length, campus.saved.length, infoEvent, tab])
+  }, [campus.feed.length, campus.saved.length, dailyOpen, infoEvent, tab])
 
   function selectTab(next: Tab) {
     setInfoId(null)
+    setDailyOpen(false)
     setTab(next)
+  }
+
+  function toggleDaily() {
+    setInfoId(null)
+    setDailyOpen((open) => !open)
   }
 
   if (campus.error) {
@@ -82,44 +90,60 @@ export function App() {
     )
   }
 
-  const surface = visibleSurface(tab, campus.feed, campus.saved, feedIndex, savedIndex)
+  const surface = dailyOpen ? "paper" : visibleSurface(tab, campus.feed, campus.saved, feedIndex, savedIndex)
 
   return (
     <main className="app">
-      <TabBar tab={tab} surface={surface} onChange={selectTab} />
-      {tab === "feed" ? (
-        <EventFeed
-          events={campus.feed}
-          onIndex={onFeedIndex}
-          onSave={(event) => void campus.setEventSaved(event.id, !event.saved)}
-          onGoing={(event) => void campus.setEventGoing(event.id, !event.going)}
-          onInfo={(event) => setInfoId(event.id)}
-        />
-      ) : null}
-      {tab === "saved" ? (
-        campus.saved.length === 0 ? (
-          <div className="page">
-            <div className="page-inner with-tabs empty-saved">
-              <p>Nothing saved yet.</p>
-            </div>
-          </div>
-        ) : (
+      <div className={surface === "paper" ? "chrome on-paper" : "chrome"}>
+        <button
+          type="button"
+          className="daily-link"
+          aria-current={dailyOpen ? "page" : undefined}
+          onClick={toggleDaily}
+        >
+          <span className="daily-link-label">Daily Event!</span>
+        </button>
+        <TabBar tab={dailyOpen ? null : tab} onChange={selectTab} />
+        <span className="chrome-spacer" aria-hidden="true">
+          Daily Event!
+        </span>
+      </div>
+      <div className="stage" hidden={dailyOpen}>
+        {tab === "feed" ? (
           <EventFeed
-            events={campus.saved}
-            onIndex={onSavedIndex}
+            events={campus.feed}
+            onIndex={onFeedIndex}
             onSave={(event) => void campus.setEventSaved(event.id, !event.saved)}
             onGoing={(event) => void campus.setEventGoing(event.id, !event.going)}
             onInfo={(event) => setInfoId(event.id)}
           />
-        )
-      ) : null}
-      {tab === "profile" ? (
-        <ProfileScreen
-          session={campus.session}
-          clubs={campus.clubs}
-          onClubs={(clubIds) => campus.saveClubs({ clubIds, onboardingComplete: true })}
-        />
-      ) : null}
+        ) : null}
+        {tab === "saved" ? (
+          campus.saved.length === 0 ? (
+            <div className="page">
+              <div className="page-inner with-tabs empty-saved">
+                <p>Nothing saved yet.</p>
+              </div>
+            </div>
+          ) : (
+            <EventFeed
+              events={campus.saved}
+              onIndex={onSavedIndex}
+              onSave={(event) => void campus.setEventSaved(event.id, !event.saved)}
+              onGoing={(event) => void campus.setEventGoing(event.id, !event.going)}
+              onInfo={(event) => setInfoId(event.id)}
+            />
+          )
+        ) : null}
+        {tab === "profile" ? (
+          <ProfileScreen
+            session={campus.session}
+            clubs={campus.clubs}
+            onClubs={(clubIds) => campus.saveClubs({ clubIds, onboardingComplete: true })}
+          />
+        ) : null}
+      </div>
+      {dailyOpen ? <DailyEvent name={campus.session.student.name} /> : null}
       {infoEvent ? <InfoSheet event={infoEvent} onClose={() => setInfoId(null)} /> : null}
     </main>
   )
