@@ -31,6 +31,26 @@ const clubs: Club[] = [
  */
 const catalog: FeedEvent[] = [
   {
+    id: "from-gmail",
+    title: "Battle of the Bands",
+    startsAt: "2026-11-21T18:00:00-05:00",
+    location: "New Haven",
+    description:
+      "The newest upcoming invite from your inbox. Save it and it lands on that day in the calendar.",
+    organizer: { id: "gmail", name: "Gmail", iconUrl: null },
+    clubId: "gmail",
+    sourceLabel: "gmail",
+    sourceUrl: "https://mail.google.com/",
+    image: {
+      url: "/events/battle.jpg",
+      alt: "A nighttime outdoor stage with bands under warm lights, the flyer for Battle of the Bands.",
+    },
+    friendsGoing: [],
+    reason: { text: "From your Gmail." },
+    saved: false,
+    going: false,
+  },
+  {
     id: "noon-cross-campus",
     title: "Noon on Cross Campus",
     startsAt: "2026-11-23T12:00:00-05:00",

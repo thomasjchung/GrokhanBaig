@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sheet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,520;9..144,650&family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="mark" href="/">sheet</a>
+    <p class="today" id="today"></p>
+  </header>
+  <main>
+    <section class="flyer" id="flyer" aria-live="polite"></section>
+    <aside class="rail">
+      <form id="search-form" role="search">
+        <label for="q">Find an account</label>
+        <input id="q" name="q" type="search" placeholder="Search clubs" autocomplete="off" />
+      </form>
+      <div id="results"></div>
+      <div id="watch"></div>
+      <button id="gmail" type="button">Connect Gmail</button>
+      <button id="check" type="button">Check for new events</button>
+      <p id="check-note" class="note"></p>
+      <form id="add-form">
+        <h2>Add a show yourself</h2>
+        <label>Name <input name="name" required maxlength="120" /></label>
+        <label>When <input name="starts_at" type="datetime-local" /></label>
+        <label>Where <input name="location_name" maxlength="80" /></label>
+        <button type="submit">Put it on the sheet</button>
+      </form>
+    </aside>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

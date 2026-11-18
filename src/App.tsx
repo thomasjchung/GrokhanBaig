@@ -3,19 +3,56 @@ import { ClubPicker } from "./components/ClubPicker"
 import { EventFeed } from "./components/EventFeed"
 import { InfoSheet } from "./components/InfoSheet"
 import { ProfileScreen } from "./components/ProfileScreen"
+import { SavedCalendar } from "./components/SavedCalendar"
+import { SignIn } from "./components/SignIn"
 import { TabBar, type Tab } from "./components/TabBar"
 import type { FeedEvent } from "./data/types"
 import { useCampus } from "./data/useCampus"
+
+const SKIP_KEY = "sheet.skip-google.v2"
 
 export function App() {
   const campus = useCampus()
   const [tab, setTab] = useState<Tab>("feed")
   const [infoId, setInfoId] = useState<string | null>(null)
   const [feedIndex, setFeedIndex] = useState(0)
-  const [savedIndex, setSavedIndex] = useState(0)
+  const [gate, setGate] = useState<"loading" | "signin" | "app">("loading")
+  const [signNotice, setSignNotice] = useState<string | null>(null)
 
   const onFeedIndex = useCallback((index: number) => setFeedIndex(index), [])
-  const onSavedIndex = useCallback((index: number) => setSavedIndex(index), [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const google = params.get("google")
+    if (google) {
+      window.history.replaceState({}, "", "/")
+    }
+    if (google === "denied") {
+      setSignNotice("Google did not grant access.")
+      setGate("signin")
+      return
+    }
+    if (google === "connected") {
+      window.localStorage.removeItem(SKIP_KEY)
+      setGate("app")
+      return
+    }
+    let cancel = false
+    fetch("/api/google/session", { credentials: "include" })
+      .then((response) => (response.ok ? response.json() : { connected: false }))
+      .then((body: { connected?: boolean }) => {
+        if (cancel) return
+        if (body.connected || window.localStorage.getItem(SKIP_KEY) === "1") setGate("app")
+        else setGate("signin")
+      })
+      .catch(() => {
+        if (cancel) return
+        setGate(window.localStorage.getItem(SKIP_KEY) === "1" ? "app" : "signin")
+      })
+    return () => {
+      cancel = true
+    }
+  }, [])
 
   const infoEvent =
     campus.feed.find((event) => event.id === infoId) ??
@@ -25,7 +62,7 @@ export function App() {
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
       if (infoEvent) return
-      if (tab !== "feed" && tab !== "saved") return
+      if (tab !== "feed") return
       if (
         event.key !== "ArrowDown" &&
         event.key !== "ArrowUp" &&
@@ -39,7 +76,7 @@ export function App() {
       event.preventDefault()
       const height = feed.clientHeight
       if (height === 0) return
-      const count = tab === "feed" ? campus.feed.length : campus.saved.length
+      const count = campus.feed.length
       const index = Math.round(feed.scrollTop / height)
       const direction = event.key === "ArrowDown" || event.key === "PageDown" ? 1 : -1
       const next = Math.max(0, Math.min(count - 1, index + direction))
@@ -49,11 +86,18 @@ export function App() {
 
     window.addEventListener("keydown", onKey)
     return () => window.removeEventListener("keydown", onKey)
-  }, [campus.feed.length, campus.saved.length, infoEvent, tab])
+  }, [campus.feed.length, infoEvent, tab])
 
   function selectTab(next: Tab) {
     setInfoId(null)
     setTab(next)
+  }
+
+  function returnToSignIn() {
+    window.localStorage.removeItem(SKIP_KEY)
+    setInfoId(null)
+    setSignNotice(null)
+    setGate("signin")
   }
 
   if (campus.error) {
@@ -68,7 +112,19 @@ export function App() {
     )
   }
 
-  if (!campus.session) return <main className="app" />
+  if (gate === "loading" || !campus.session) return <main className="app" />
+
+  if (gate === "signin") {
+    return (
+      <SignIn
+        notice={signNotice}
+        onDemo={() => {
+          window.localStorage.setItem(SKIP_KEY, "1")
+          setGate("app")
+        }}
+      />
+    )
+  }
 
   if (!campus.session.onboardingComplete) {
     return (
@@ -77,12 +133,13 @@ export function App() {
           clubs={campus.clubs}
           initialIds={campus.session.clubIds}
           onContinue={(clubIds) => campus.saveClubs({ clubIds, onboardingComplete: true })}
+          onSignIn={returnToSignIn}
         />
       </main>
     )
   }
 
-  const surface = visibleSurface(tab, campus.feed, campus.saved, feedIndex, savedIndex)
+  const surface = visibleSurface(tab, campus.feed, feedIndex)
 
   return (
     <main className="app">
@@ -104,11 +161,9 @@ export function App() {
             </div>
           </div>
         ) : (
-          <EventFeed
+          <SavedCalendar
             events={campus.saved}
-            onIndex={onSavedIndex}
             onSave={(event) => void campus.setEventSaved(event.id, !event.saved)}
-            onGoing={(event) => void campus.setEventGoing(event.id, !event.going)}
             onInfo={(event) => setInfoId(event.id)}
           />
         )
@@ -118,6 +173,7 @@ export function App() {
           session={campus.session}
           clubs={campus.clubs}
           onClubs={(clubIds) => campus.saveClubs({ clubIds, onboardingComplete: true })}
+          onSignIn={returnToSignIn}
         />
       ) : null}
       {infoEvent ? <InfoSheet event={infoEvent} onClose={() => setInfoId(null)} /> : null}
@@ -125,18 +181,8 @@ export function App() {
   )
 }
 
-function visibleSurface(
-  tab: Tab,
-  feed: FeedEvent[],
-  saved: FeedEvent[],
-  feedIndex: number,
-  savedIndex: number,
-): "photo" | "paper" {
-  if (tab === "profile") return "paper"
-  if (tab === "saved") {
-    const event = saved[savedIndex]
-    return event?.image ? "photo" : "paper"
-  }
+function visibleSurface(tab: Tab, feed: FeedEvent[], feedIndex: number): "photo" | "paper" {
+  if (tab === "profile" || tab === "saved") return "paper"
   const event = feed[feedIndex]
   return event?.image ? "photo" : "paper"
 }

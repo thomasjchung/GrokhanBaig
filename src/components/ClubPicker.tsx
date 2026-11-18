@@ -6,10 +6,12 @@ export function ClubPicker({
   clubs,
   initialIds,
   onContinue,
+  onSignIn,
 }: {
   clubs: Club[]
   initialIds: string[]
   onContinue: (clubIds: string[]) => Promise<void>
+  onSignIn: () => void
 }) {
   const [selected, setSelected] = useState(initialIds)
   const [pending, setPending] = useState(false)
@@ -44,6 +46,9 @@ export function ClubPicker({
           onClick={() => void submit()}
         >
           {pending ? "Saving" : "Continue"}
+        </button>
+        <button type="button" className="text-action" onClick={onSignIn}>
+          Back to sign in
         </button>
       </div>
     </div>

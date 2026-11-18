@@ -440,6 +440,135 @@ button {
   font-size: 1.35rem;
 }
 
+.sign-in {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.google-button {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 0.4rem;
+  padding: 0.85rem 1.15rem;
+  border: 1px solid rgba(34, 30, 26, 0.45);
+  color: inherit;
+  font-size: 1.15rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.google-button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 4px;
+}
+
+.profile-email a {
+  color: inherit;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.calendar-head h2 {
+  margin: 1.4rem 0 0;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.calendar-shift {
+  margin-top: 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-top: 0.8rem;
+}
+
+.calendar-dow,
+.calendar-day {
+  min-height: 44px;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.calendar-dow {
+  color: var(--paper-quiet);
+  line-height: 44px;
+}
+
+.calendar-day {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.calendar-day.has-events {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.calendar-day[aria-pressed="true"] {
+  background: rgba(34, 30, 26, 0.08);
+}
+
+.day-events h2 {
+  margin-top: 1.6rem;
+}
+
+.day-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid rgba(34, 30, 26, 0.14);
+}
+
+.day-event:last-child {
+  border-bottom: 1px solid rgba(34, 30, 26, 0.14);
+}
+
+.day-event-open {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 44px;
+  padding: 0.85rem 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.day-event-title {
+  font-size: 1.2rem;
+}
+
+.day-event-meta {
+  color: var(--paper-quiet);
+  font-size: 1rem;
+}
+
+.day-unsave {
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
 .sheet-layer {
   position: absolute;
   inset: 0;
