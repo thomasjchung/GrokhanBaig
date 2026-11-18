@@ -105,32 +105,19 @@ button {
 }
 
 .daily-link {
-  padding-right: 0.7rem;
-  padding-left: 0.7rem;
-  border-radius: 999px;
-  background:
-    linear-gradient(180deg, rgba(255, 244, 214, 0.2), rgba(255, 214, 120, 0) 46%),
-    rgba(42, 26, 8, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 248, 220, 0.55),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
-    0 1px 2px rgba(12, 8, 4, 0.28);
-  color: #f0c14b;
+  color: #e0a82a;
   text-align: left;
 }
 
 .daily-link-label {
   display: inline-block;
-  background-image: linear-gradient(180deg, #fff8dc 0%, #ffe28a 34%, #e8b023 62%, #fff3c4 100%);
+  background-image: linear-gradient(180deg, #ffe7a3 0%, #f0c14b 42%, #c9962a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(62, 36, 4, 0.55));
 }
 
 .chrome-spacer {
-  padding-right: 0.7rem;
-  padding-left: 0.7rem;
   visibility: hidden;
   pointer-events: none;
 }
