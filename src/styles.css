@@ -53,27 +53,47 @@ button {
   background: var(--stage);
 }
 
-.tabbar {
+.chrome {
   position: absolute;
   z-index: 4;
   top: 0;
   right: 0;
   left: 0;
-  display: flex;
-  justify-content: center;
-  gap: 1.75rem;
-  padding: calc(0.85rem + env(safe-area-inset-top)) 1.25rem 0.35rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  padding: calc(0.85rem + env(safe-area-inset-top))
+    max(0.85rem, env(safe-area-inset-right))
+    0.15rem
+    max(0.85rem, env(safe-area-inset-left));
   color: var(--ink);
   pointer-events: none;
 }
 
-.tabbar.on-paper {
+.chrome.on-paper {
   color: var(--paper-ink);
 }
 
+.tabbar {
+  display: flex;
+  justify-content: center;
+  gap: 1.75rem;
+  min-width: 0;
+  color: inherit;
+  pointer-events: none;
+}
+
+.daily-link,
+.chrome-spacer,
 .tab {
   min-height: 44px;
   padding: 0.35rem 0.15rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.daily-link,
+.tab {
   border: 0;
   background: none;
   color: inherit;
@@ -82,6 +102,39 @@ button {
   font-weight: 500;
   cursor: pointer;
   pointer-events: auto;
+}
+
+.daily-link {
+  color: #e0a82a;
+  text-align: left;
+}
+
+.daily-link-label {
+  display: inline-block;
+  background-image: linear-gradient(180deg, #ffe7a3 0%, #f0c14b 42%, #c9962a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.chrome-spacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.daily-link[aria-current="page"] {
+  font-weight: 600;
+}
+
+.daily-link[aria-current="page"] .daily-link-label {
+  text-decoration: underline;
+  text-decoration-color: #e8b023;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.32em;
+}
+
+.stage {
+  height: 100%;
 }
 
 .tab[aria-current="page"] {
@@ -308,7 +361,8 @@ button {
 .control:active,
 .text-action:active,
 .sheet-close:active,
-.club:active {
+.club:active,
+.daily-link:active {
   opacity: 0.62;
 }
 
@@ -317,7 +371,8 @@ button {
 .text-action:focus-visible,
 .sheet-close:focus-visible,
 .sheet-source a:focus-visible,
-.club:focus-visible {
+.club:focus-visible,
+.daily-link:focus-visible {
   outline: 1px solid currentColor;
   outline-offset: 4px;
 }
@@ -345,6 +400,10 @@ button {
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.025em;
+}
+
+.daily-title-name {
+  white-space: nowrap;
 }
 
 .page h2 {
@@ -569,6 +628,100 @@ button {
   margin-top: 0;
 }
 
+.board {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board-row {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgba(34, 30, 26, 0.14);
+  font-size: 1.25rem;
+}
+
+.board-row:last-child {
+  border-bottom: 1px solid rgba(34, 30, 26, 0.14);
+}
+
+.board-rank,
+.board-score {
+  font-variant-numeric: tabular-nums;
+}
+
+.board-rank {
+  color: var(--paper-quiet);
+}
+
+.board-who {
+  min-width: 0;
+}
+
+.board-name {
+  font-weight: 450;
+}
+
+.board-row.is-you .board-name {
+  font-weight: 560;
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
+.board-emoji {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.board-note,
+.form-note,
+.field-label {
+  color: var(--paper-quiet);
+}
+
+.board-note,
+.form-note {
+  margin: 0.85rem 0 0;
+  font-size: 1.05rem;
+}
+
+.field-label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 1.05rem;
+}
+
+.krillion-field {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0 0.55rem;
+  border: 0;
+  border-bottom: 1px solid rgba(34, 30, 26, 0.28);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.krillion-field:focus {
+  outline: none;
+  border-bottom-color: currentColor;
+}
+
+.krillion-field::placeholder {
+  color: var(--paper-quiet);
+  opacity: 0.55;
+}
+
 .sheet-layer {
   position: absolute;
   inset: 0;
@@ -700,6 +853,26 @@ button {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+@media (max-width: 520px) {
+  .chrome {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .chrome-spacer {
+    display: none;
+  }
+
+  .tabbar {
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  .daily-link,
+  .tab {
+    font-size: 0.98rem;
+  }
 }
 
 @media (max-height: 700px) {

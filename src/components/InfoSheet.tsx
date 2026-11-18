@@ -17,7 +17,7 @@ export function InfoSheet({ event, onClose }: { event: FeedEvent; onClose: () =>
     const previouslyFocused = document.activeElement
     const frame = requestAnimationFrame(() => setEntered(true))
     closeRef.current?.focus()
-    const background = document.querySelectorAll(".feed, .tabbar, .page")
+    const background = document.querySelectorAll(".feed, .chrome, .page")
     background.forEach((node) => node.setAttribute("inert", ""))
 
     function onKey(keyEvent: KeyboardEvent) {
